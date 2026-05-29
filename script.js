@@ -1711,3 +1711,20 @@ $(document).ready(function() {
 	/* var month = $('.ui-datepicker-month').text().toLowerCase();
   $('.calendar_img').addClass(month);*/
 });
+
+// OVERRIDE: data-window ile kesin eşleştirme
+$(document).ready(function() {
+  $('.taskbarApp[data-window]').off('click').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var appName = $(this).data('window');
+    var targetWindow = $('[data-window="' + appName + '"].window');
+    if (targetWindow.length === 0) return;
+    
+    $('.window').removeClass('window--active');
+    targetWindow
+      .removeClass('window--minimized window--closed')
+      .addClass('window--active')
+      .css({ 'z-index': 9999, 'pointer-events': 'all', opacity: 1 });
+  });
+});
