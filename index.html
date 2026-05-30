@@ -24,6 +24,8 @@
     .wa-out { background:#005c4b; color:#e9edef; align-self:flex-end; border-radius:8px 0 8px 8px; }
     .misra-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; color:rgba(255,255,255,0.4); font-size:13px; }
     .misra-placeholder img { width:64px; height:64px; border-radius:14px; object-fit:cover; }
+    .window--fullscreen { position:fixed !important; top:0 !important; left:0 !important; width:100vw !important; height:100vh !important; z-index:9998 !important; border-radius:0 !important; max-width:none !important; max-height:none !important; }
+    .window--fullscreen .window__handler { border-radius:0 !important; }
     .window--messages .window__body, .window--whatsapp .window__body,
     .window--instagram .window__body, .window--photos .window__body,
     .window--spotify .window__body, .window--letterboxd .window__body,
@@ -199,13 +201,6 @@
         <div class="window__controls"><a class="window__close"></a><a class="window__minimize"></a><a class="window__maximize disabled"></a></div>
         <input type="text" class="search" placeholder="Ara" />
         <div class="new"></div>
-        <div class="chatNav">
-          <div class="user" style="background-image:url(tolga_pp.png);" data-name="Tolga" data-state="online"></div>
-          <div class="user" style="background:linear-gradient(135deg,#f093fb,#f5576c);" data-name="Nil" data-state="online"></div>
-          <div class="user" style="background:linear-gradient(135deg,#4facfe,#00f2fe);" data-name="Anne" data-state="offline"></div>
-          <div class="user" style="background:#2c3e50;" data-name="Selim Hoca" data-state="offline"></div>
-          <div class="user" style="background:linear-gradient(135deg,#a8edea,#fed6e3);" data-name="BeautyNailSalon" data-state="offline"></div>
-        </div>
       </div>
       <div class="window__body">
         <div class="sidebar" data-display="cards">
@@ -801,34 +796,42 @@
   </script>
 
 
-  // ESC tuşu fix - launchpad değil pencereyi kapat
+  // ESC tuşu fix
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      // Önce fullscreen'den çık
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
+      var fullWin = document.querySelector('.window--fullscreen');
+      if (fullWin) {
+        fullWin.classList.remove('window--fullscreen');
+        fullWin.style.cssText = fullWin.dataset.prevStyle || '';
         return;
       }
-      // Launchpad açıksa kapat
-      var appMenu = document.querySelector('.appMenu.active, .appMenu.open');
-      if (appMenu) { appMenu.classList.remove('active','open'); return; }
     }
   });
 
-  // Maximize butonuna basınca pencere kontrolleri görünsün
-  document.querySelectorAll('.window__maximize').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var win = this.closest('.window');
-      if (!win) return;
-      if (win.classList.contains('window--fullscreen')) {
-        win.classList.remove('window--fullscreen');
-        win.style.cssText = win.dataset.prevStyle || '';
-      } else {
-        win.dataset.prevStyle = win.style.cssText;
-        win.classList.add('window--fullscreen');
-        win.style.cssText = 'top:0;left:0;width:100vw;height:100vh;z-index:9998;border-radius:0;';
-      }
+  // Maximize fix - her penceredeki maximize butonunu override et
+  setTimeout(function() {
+    document.querySelectorAll('.window__maximize:not(.disabled)').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var win = this.closest('.window');
+        if (!win) return;
+        if (win.classList.contains('window--fullscreen')) {
+          win.classList.remove('window--fullscreen');
+          win.style.cssText = win.dataset.prevStyle || '';
+        } else {
+          win.dataset.prevStyle = win.style.cssText;
+          win.classList.add('window--fullscreen');
+          win.style.top = '0';
+          win.style.left = '0';
+          win.style.width = '100vw';
+          win.style.height = '100vh';
+          win.style.zIndex = '9998';
+          win.style.borderRadius = '0';
+          win.style.maxWidth = 'none';
+          win.style.maxHeight = 'none';
+        }
+      });
     });
-  });
+  }, 1000);
 </body>
 </html>
