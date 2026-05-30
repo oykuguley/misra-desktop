@@ -12,9 +12,9 @@
   <link rel="stylesheet" href="./style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
   <style>
-    .window { transition: opacity 0.2s ease, transform 0.2s ease !important; }
-    .window.window--minimized { opacity:0 !important; transform:scale(0.93) !important; pointer-events:none !important; }
-    .window:not(.window--minimized) { opacity:1 !important; transform:scale(1) !important; }
+
+    .window.window--minimized {}
+    
     .icon-img { width:42px !important; height:42px !important; border-radius:12px; object-fit:cover; display:block !important; pointer-events:none; }
     .taskbarApp { display:flex !important; align-items:center !important; justify-content:center !important; transition:transform 0.15s ease !important; }
     .taskbarApp:hover { transform:translateY(-6px) scale(1.1) !important; }
