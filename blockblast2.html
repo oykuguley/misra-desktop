@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Block Blast</title>
+<style>
+html{height:100%;}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f5f3ef;--card:#edeae4;--card-border:#d8d5cf;
+  --cell-bg:#faf9f7;--cell-border:#e0ddd8;--text:#333;--text-muted:#888;
+  --grid-bg:#edeae4;--gameover-bg:#faf9f7;--combo-bg:#b8d4f0;
+  --combo-color:#2a5a8a;--score-fly:#7aacda;--tt:background 0.3s,color 0.3s,border-color 0.3s;
+  --accent:#a8c5e8;--accent-dark:#7aacda;
+}
+body.dark{
+  --bg:#181a20;--card:#23263a;--card-border:#2e3150;
+  --cell-bg:#1e2030;--cell-border:#2a2e48;--text:#e8e8f0;--text-muted:#7a7fa8;
+  --grid-bg:#23263a;--gameover-bg:#1e2030;--combo-bg:#1e3a5a;
+  --combo-color:#7ab8e8;--score-fly:#6ab0e0;
+}
+body{background:var(--bg);display:flex;justify-content:center;align-items:flex-start;height:100%;padding:4px;font-family:system-ui,sans-serif;transition:var(--tt);overflow-y:auto;margin:0;}
+#root{display:flex;flex-direction:column;align-items:center;padding:16px;gap:14px;width:100%;}
+
+/* MOD SEÇİM */
+#mode-screen{display:flex;flex-direction:column;align-items:center;gap:28px;padding:40px 20px;max-width:420px;width:100%;}
+#mode-screen h1{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-0.5px;}
+#mode-screen p{font-size:14px;color:var(--text-muted);text-align:center;line-height:1.5;}
+.mode-cards{display:flex;flex-direction:column;gap:14px;width:100%;}
+.mode-card{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:20px 22px;cursor:pointer;transition:transform 0.15s,border-color 0.15s,box-shadow 0.15s;text-align:left;}
+.mode-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 6px 20px rgba(0,0,0,0.07);}
+.mode-card-icon{font-size:28px;margin-bottom:8px;}
+.mode-card-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.mode-card-desc{font-size:13px;color:var(--text-muted);line-height:1.45;}
+.mode-top-btns{display:flex;gap:8px;align-self:flex-end;}
+
+/* OYUN */
+#game-screen{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;}
+#topbar{display:flex;gap:8px;width:100%;max-width:700px;justify-content:center;flex-wrap:wrap;align-items:center;}
+.scard{background:var(--card);border-radius:8px;padding:8px 16px;text-align:center;min-width:90px;border:0.5px solid var(--card-border);transition:var(--tt);}
+.scard.bump{animation:scorebump 0.3s ease-out;}
+@keyframes scorebump{0%{transform:scale(1);}40%{transform:scale(1.18);}100%{transform:scale(1);}}
+.sl{font-size:11px;color:var(--text-muted);letter-spacing:1px;}
+.sv{font-size:20px;font-weight:500;color:var(--text);margin-top:2px;}
+#game-inner{display:flex;gap:20px;align-items:flex-start;justify-content:center;width:100%;flex-wrap:wrap;}
+#left-col{display:flex;flex-direction:column;gap:14px;align-items:center;}
+#arena{display:flex;gap:16px;align-items:flex-start;justify-content:center;}
+#grid-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
+#grid{display:grid;grid-template-columns:repeat(8,38px);grid-template-rows:repeat(8,38px);gap:2px;background:var(--grid-bg);border-radius:12px;padding:6px;border:0.5px solid var(--card-border);transition:var(--tt);}
+.gcell{width:38px;height:38px;border-radius:5px;background:var(--cell-bg);border:0.5px solid var(--cell-border);transition:background 0.06s,transform 0.1s;}
+.gcell.filled{border-color:transparent;}
+.gcell.preview{opacity:0.45;border-color:transparent;}
+.gcell.invalid{background:#f4b8b8!important;opacity:0.45;animation:shake 0.2s ease;}
+@keyframes shake{0%{transform:translateX(0);}25%{transform:translateX(-3px);}75%{transform:translateX(3px);}100%{transform:translateX(0);}}
+.gcell.placing{animation:placeIn 0.2s cubic-bezier(.2,1.6,.4,1) forwards;}
+@keyframes placeIn{0%{transform:scale(0.5);opacity:0.5;}100%{transform:scale(1);opacity:1;}}
+.gcell.clearing{animation:clearOut 0.32s ease-out forwards;}
+@keyframes clearOut{0%{transform:scale(1.1);filter:brightness(1.5);}60%{transform:scale(0.7);filter:brightness(1.8);}100%{transform:scale(0);opacity:0;}}
+.gcell.refill{animation:refillIn 0.22s 0.33s ease-out both;}
+@keyframes refillIn{0%{transform:scale(0);opacity:0;}100%{transform:scale(1);opacity:1;}}
+#pieces-area{display:flex;flex-direction:column;gap:12px;align-items:center;min-width:80px;}
+.piece-slot{width:80px;height:80px;display:flex;align-items:center;justify-content:center;}
+.piece-card{background:var(--card);border-radius:12px;padding:10px;border:0.5px solid var(--card-border);cursor:grab;transition:border-color 0.15s,transform 0.15s,background 0.3s;animation:cardIn 0.35s cubic-bezier(.2,1.4,.4,1) both;}
+@keyframes cardIn{0%{transform:translateX(40px);opacity:0;}100%{transform:translateX(0);opacity:1;}}
+.piece-card.used{animation:cardOut 0.25s cubic-bezier(.4,0,.6,1) forwards;pointer-events:none;}
+@keyframes cardOut{0%{transform:scale(1);opacity:1;}100%{transform:scale(0.5);opacity:0;}}
+.piece-card:hover:not(.used){transform:translateY(-3px);}
+.piece-card.selected{border-color:var(--accent);border-width:1.5px;transform:translateY(-4px);}
+.piece-card.dragging{opacity:0.35;transform:scale(0.95);}
+.pmini{display:grid;gap:2px;}
+.pmini-cell{width:26px;height:26px;border-radius:3px;}
+#msg{font-size:13px;color:var(--text-muted);min-height:18px;transition:opacity 0.2s;}
+.ctrl-btn{padding:5px 12px;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;background:var(--card);color:var(--text-muted);border:0.5px solid var(--card-border);transition:var(--tt);}
+.ctrl-btn:hover{color:var(--text);}
+#combo-toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--combo-bg);color:var(--combo-color);font-size:20px;font-weight:500;border-radius:12px;padding:10px 24px;pointer-events:none;z-index:20;white-space:nowrap;}
+#combo-toast.show{animation:toastPop 0.7s cubic-bezier(.2,1.4,.4,1) forwards;}
+@keyframes toastPop{0%{transform:translate(-50%,-50%) scale(0);opacity:0;}30%{transform:translate(-50%,-50%) scale(1.1);opacity:1;}70%{transform:translate(-50%,-50%) scale(1);opacity:1;}100%{transform:translate(-50%,-70%) scale(0.9);opacity:0;}}
+.score-fly{position:absolute;font-size:14px;font-weight:500;color:var(--score-fly);pointer-events:none;z-index:30;animation:flyUp 0.8s ease-out forwards;}
+@keyframes flyUp{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-50px);}}
+#gameover{display:none;flex-direction:column;align-items:center;gap:10px;padding:20px;background:var(--gameover-bg);border-radius:12px;border:0.5px solid var(--card-border);width:100%;max-width:340px;transition:var(--tt);}
+#gameover h3{font-size:18px;font-weight:500;color:var(--text);}
+#gameover p{font-size:13px;color:var(--text-muted);}
+#restart-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;background:var(--card);color:var(--text);border:0.5px solid var(--card-border);transition:var(--tt);}
+#restart-btn:hover{filter:brightness(0.95);}
+
+/* SÜRÜKLE GHOST */
+#drag-ghost{position:fixed;pointer-events:none;z-index:1000;opacity:0.88;display:none;transform:translate(-50%,-50%);}
+#drag-ghost .pmini-cell{width:40px;height:40px;border-radius:5px;}
+#drag-ghost .pmini{gap:2px;}
+body.dragging-active{user-select:none;cursor:grabbing;}
+
+/* PODCAST PANEL */
+#podcast-panel{display:none;flex-direction:column;gap:0;width:280px;flex-shrink:0;background:var(--card);border-radius:16px;border:0.5px solid var(--card-border);overflow:hidden;transition:var(--tt);}
+#podcast-panel.visible{display:flex;}
+
+/* Şu an çalınan */
+#now-playing{padding:16px;background:var(--grid-bg);border-bottom:0.5px solid var(--card-border);}
+#np-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+#np-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.3;}
+
+/* Custom audio player */
+#audio-player-wrap{display:flex;flex-direction:column;gap:8px;}
+#progress-wrap{position:relative;height:4px;background:var(--card-border);border-radius:2px;cursor:pointer;}
+#progress-bar{height:4px;background:var(--accent);border-radius:2px;width:0%;transition:width 0.1s linear;pointer-events:none;}
+#progress-handle{position:absolute;top:50%;width:12px;height:12px;background:var(--accent);border-radius:50%;transform:translate(-50%,-50%);left:0%;cursor:pointer;transition:left 0.1s linear;}
+#time-row{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);}
+#player-controls{display:flex;align-items:center;justify-content:center;gap:12px;}
+.pc-btn{background:none;border:none;cursor:pointer;color:var(--text);font-size:18px;padding:4px;border-radius:6px;transition:opacity 0.15s;}
+.pc-btn:hover{opacity:0.7;}
+#play-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;transition:transform 0.1s,background 0.2s;}
+#play-btn:hover{transform:scale(1.08);}
+#vol-row{display:flex;align-items:center;gap:6px;}
+#vol-icon{font-size:12px;color:var(--text-muted);}
+#vol-slider{-webkit-appearance:none;appearance:none;width:100%;height:3px;border-radius:2px;background:var(--card-border);outline:none;cursor:pointer;}
+#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--accent);cursor:pointer;}
+
+/* Bölüm listesi */
+#ep-list-wrap{padding:10px 12px;display:flex;flex-direction:column;gap:1px;max-height:320px;overflow-y:auto;}
+#ep-list-wrap::-webkit-scrollbar{width:3px;}
+#ep-list-wrap::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:2px;}
+.ep-item{display:flex;align-items:center;gap:8px;padding:8px 6px;border-radius:8px;cursor:pointer;transition:background 0.12s;}
+.ep-item:hover{background:var(--cell-bg);}
+.ep-item.active{background:var(--combo-bg);}
+.ep-num{font-size:10px;color:var(--text-muted);min-width:16px;font-weight:600;}
+.ep-info{flex:1;}
+.ep-title{font-size:12px;color:var(--text);line-height:1.3;}
+.ep-dur{font-size:10px;color:var(--text-muted);margin-top:1px;}
+.ep-play-icon{font-size:10px;color:var(--accent);opacity:0;}
+.ep-item.active .ep-play-icon{opacity:1;}
+.ep-item:hover .ep-play-icon{opacity:0.5;}
+
+@media(max-width:720px){
+  #game-inner{flex-direction:column;align-items:center;}
+  #podcast-panel{width:100%;max-width:400px;}
+}
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="drag-ghost"></div>
+
+  <!-- MOD SEÇİM -->
+  <div id="mode-screen">
+    <div class="mode-top-btns">
+      <button class="ctrl-btn" id="dark-btn-mode" onclick="toggleDark()">🌙</button>
+    </div>
+    <h1>Block Blast 🧩</h1>
+    <p>Nasıl oynamak istersin?</p>
+    <div class="mode-cards">
+      <div class="mode-card" onclick="startGame('classic')">
+        <div class="mode-card-icon">🎮</div>
+        <div class="mode-card-title">Klasik Mod</div>
+        <div class="mode-card-desc">Sade, odaklanmış oyun deneyimi. Sadece bloklar ve sen.</div>
+      </div>
+      <div class="mode-card" onclick="startGame('podcast')">
+        <div class="mode-card-icon">🎧</div>
+        <div class="mode-card-title">Podcast Modu</div>
+        <div class="mode-card-desc">Oyun oynarken "10 dakika kadar" dinle! Bölümler sırayla çalınır, istediğin bölüme atlayabilirsin.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OYUN EKRANI -->
+  <div id="game-screen">
+    <div id="topbar">
+      <div class="scard"><div class="sl">Skor</div><div class="sv" id="sv">0</div></div>
+      <div class="scard"><div class="sl">En Yüksek</div><div class="sv" id="bv">0</div></div>
+      <div class="scard"><div class="sl">Temizlenen</div><div class="sv" id="lv">0</div></div>
+      <button class="ctrl-btn" id="sound-btn" onclick="toggleSound()">🔊</button>
+      <button class="ctrl-btn" id="dark-btn" onclick="toggleDark()">🌙</button>
+      <button class="ctrl-btn" onclick="goMenu()">⬅ Menü</button>
+    </div>
+    <div id="game-inner">
+      <div id="left-col">
+        <div id="arena">
+          <div id="grid-wrap">
+            <div id="grid"></div>
+            <div id="combo-toast"></div>
+            <div id="msg">Bir blok seç, sonra grid üzerine tıkla</div>
+          </div>
+          <div id="pieces-area">
+            <div class="piece-slot"><div id="p0" class="piece-card" onclick="handlePieceClick(0)"></div></div>
+            <div class="piece-slot"><div id="p1" class="piece-card" onclick="handlePieceClick(1)"></div></div>
+            <div class="piece-slot"><div id="p2" class="piece-card" onclick="handlePieceClick(2)"></div></div>
+          </div>
+        </div>
+        <div id="gameover">
+          <h3>Oyun bitti</h3>
+          <p id="go-score"></p>
+          <button id="restart-btn" onclick="restartGame()">Yeniden oyna</button>
+        </div>
+      </div>
+
+      <!-- PODCAST PANEL -->
+      <div id="podcast-panel">
+        <div id="now-playing">
+          <div id="np-label">🎧 Şu an çalıyor</div>
+          <div id="np-title">—</div>
+          <div id="audio-player-wrap">
+            <div id="progress-wrap" onmousedown="seekStart(event)" ontouchstart="seekStart(event)">
+              <div id="progress-bar"></div>
+              <div id="progress-handle"></div>
+            </div>
+            <div id="time-row">
+              <span id="time-cur">0:00</span>
+              <span id="time-tot">0:00</span>
+            </div>
+            <div id="player-controls">
+              <button class="pc-btn" onclick="prevEp()" title="Önceki">⏮</button>
+              <button class="pc-btn" onclick="seekRel(-10)" title="-10s">↺</button>
+              <button id="play-btn" onclick="togglePlay()">▶</button>
+              <button class="pc-btn" onclick="seekRel(10)" title="+10s">↻</button>
+              <button class="pc-btn" onclick="nextEp()" title="Sonraki">⏭</button>
+            </div>
+            <div id="vol-row">
+              <span id="vol-icon">🔈</span>
+              <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="1" oninput="setVol(this.value)">
+            </div>
+          </div>
+        </div>
+        <div id="ep-list-wrap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── PODCAST VERİSİ ── */
+const EPISODES=[
+  {title:'Intro',       file:'audio/01_intro.mp3'},
+  {title:'Pilot',       file:'audio/02_pilot.mp3'},
+  {title:'1. Bölüm',   file:'audio/03_birinci.mp3'},
+  {title:'2. Bölüm',   file:'audio/04_ikinci.mp3'},
+  {title:'3. Bölüm',   file:'audio/05_ucuncu.mp3'},
+  {title:'4. Bölüm',   file:'audio/06_dorduncu.mp3'},
+  {title:'5. Bölüm',   file:'audio/07_besinci.mp3'},
+  {title:'6. Bölüm',   file:'audio/08_altinci.mp3'},
+];
+
+let audio=new Audio();
+let curEp=-1;
+let isPlaying=false;
+let isSeeking=false;
+
+function fmtTime(s){
+  if(isNaN(s)||s<0)return'0:00';
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
+function loadEp(i,autoplay){
+  curEp=i;
+  const ep=EPISODES[i];
+  audio.src=ep.file;
+  audio.load();
+  document.getElementById('np-title').textContent=ep.title;
+  document.querySelectorAll('.ep-item').forEach((el,j)=>el.classList.toggle('active',j===i));
+  // scroll aktif öğeye
+  const items=document.querySelectorAll('.ep-item');
+  if(items[i])items[i].scrollIntoView({block:'nearest',behavior:'smooth'});
+  updatePlayBtn(false);
+  document.getElementById('progress-bar').style.width='0%';
+  document.getElementById('progress-handle').style.left='0%';
+  document.getElementById('time-cur').textContent='0:00';
+  document.getElementById('time-tot').textContent='0:00';
+  if(autoplay){audio.play();isPlaying=true;updatePlayBtn(true);}
+}
+
+function togglePlay(){
+  if(curEp<0){loadEp(0,true);return;}
+  if(isPlaying){audio.pause();isPlaying=false;}
+  else{audio.play();isPlaying=true;}
+  updatePlayBtn(isPlaying);
+}
+
+function updatePlayBtn(playing){
+  document.getElementById('play-btn').textContent=playing?'⏸':'▶';
+}
+
+function nextEp(){
+  if(curEp<EPISODES.length-1)loadEp(curEp+1,isPlaying);
+}
+function prevEp(){
+  if(audio.currentTime>3){audio.currentTime=0;return;}
+  if(curEp>0)loadEp(curEp-1,isPlaying);
+}
+function seekRel(s){audio.currentTime=Math.max(0,Math.min(audio.duration||0,audio.currentTime+s));}
+function setVol(v){audio.volume=v;document.getElementById('vol-icon').textContent=v>0.5?'🔊':v>0?'🔈':'🔇';}
+
+/* Seek bar */
+function seekStart(e){
+  isSeeking=true;
+  seekMove(e);
+  const move=e.type==='mousedown'?'mousemove':'touchmove';
+  const up=e.type==='mousedown'?'mouseup':'touchend';
+  const onMove=ev=>seekMove(ev);
+  const onUp=()=>{isSeeking=false;document.removeEventListener(move,onMove);document.removeEventListener(up,onUp);};
+  document.addEventListener(move,onMove);
+  document.addEventListener(up,onUp);
+}
+function seekMove(e){
+  if(!isSeeking||!audio.duration)return;
+  const wrap=document.getElementById('progress-wrap');
+  const rect=wrap.getBoundingClientRect();
+  const cx=e.touches?e.touches[0].clientX:e.clientX;
+  const pct=Math.max(0,Math.min(1,(cx-rect.left)/rect.width));
+  audio.currentTime=pct*audio.duration;
+}
+
+/* Audio event'leri */
+audio.addEventListener('timeupdate',()=>{
+  if(!audio.duration||isSeeking)return;
+  const pct=(audio.currentTime/audio.duration)*100;
+  document.getElementById('progress-bar').style.width=pct+'%';
+  document.getElementById('progress-handle').style.left=pct+'%';
+  document.getElementById('time-cur').textContent=fmtTime(audio.currentTime);
+});
+audio.addEventListener('loadedmetadata',()=>{
+  document.getElementById('time-tot').textContent=fmtTime(audio.duration);
+});
+audio.addEventListener('ended',()=>{
+  isPlaying=false;updatePlayBtn(false);
+  if(curEp<EPISODES.length-1){setTimeout(()=>loadEp(curEp+1,true),800);}
+});
+audio.addEventListener('play',()=>{isPlaying=true;updatePlayBtn(true);});
+audio.addEventListener('pause',()=>{isPlaying=false;updatePlayBtn(false);});
+
+function buildEpList(){
+  const wrap=document.getElementById('ep-list-wrap');
+  wrap.innerHTML='';
+  EPISODES.forEach((ep,i)=>{
+    const d=document.createElement('div');
+    d.className='ep-item'+(i===curEp?' active':'');
+    d.innerHTML=`<span class="ep-num">${i+1}</span><div class="ep-info"><div class="ep-title">${ep.title}</div></div><span class="ep-play-icon">▶</span>`;
+    d.onclick=()=>loadEp(i,true);
+    wrap.appendChild(d);
+  });
+}
+
+function initPodcast(){
+  buildEpList();
+  loadEp(0,false); // ilk bölümü yükle ama çalma
+}
+
+function stopPodcast(){
+  audio.pause();audio.src='';isPlaying=false;curEp=-1;
+}
+
+/* ── MOD YÖNETİMİ ── */
+let podcastMode=false;
+function startGame(mode){
+  podcastMode=(mode==='podcast');
+  document.getElementById('mode-screen').style.display='none';
+  document.getElementById('game-screen').style.display='flex';
+  const panel=document.getElementById('podcast-panel');
+  if(podcastMode){panel.classList.add('visible');initPodcast();}
+  else panel.classList.remove('visible');
+  buildGrid();initBoard();score=0;lines=0;updateScoreUI();renderGrid();newPieces();
+}
+function goMenu(){
+  stopPodcast();
+  document.getElementById('podcast-panel').classList.remove('visible');
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('mode-screen').style.display='flex';
+  document.getElementById('gameover').style.display='none';
+  document.getElementById('arena').style.opacity='1';
+}
+
+/* ── OYUN KODU ── */
+const COLS=8,ROWS=8;
+const COLORS=['#a8c5e8','#a8d5b8','#f0b8a8','#c5b8e8','#f0d8a0','#f0b8cc','#a8d8d0','#d8c8a8','#c8e0a8'];
+const SHAPES=[
+  [[1,1,1]],[[1],[1],[1]],[[1,1],[1,1]],
+  [[1,1,1],[0,0,1]],[[1,1,1],[1,0,0]],
+  [[1,0],[1,0],[1,1]],[[0,1],[0,1],[1,1]],
+  [[1,1,1,1]],[[1],[1],[1],[1]],
+  [[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]],
+  [[1,1,1],[0,1,0]],[[1]],[[1,1]],[[1],[1]],
+  [[1,1],[1,0]],[[1,1],[0,1]],[[0,1],[1,1]],[[1,0],[1,1]],
+  [[1,0,0],[1,0,0],[1,1,1]],[[0,0,1],[0,0,1],[1,1,1]],
+  [[1,1,1],[1,0,0],[1,0,0]],[[1,1,1],[0,0,1],[0,0,1]],
+];
+let board,score,bestScore,lines,pieces,selectedPiece,usedFlags,soundOn=true;
+let audioCtx;
+try{bestScore=parseInt(localStorage.getItem('bb_soft_best')||'0');}catch(e){bestScore=0;}
+function getAudioCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function beep(freq,dur,type,vol){type=type||'sine';vol=vol||0.09;
+  if(!soundOn)return;
+  try{const c=getAudioCtx(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+dur);
+    o.start(c.currentTime);o.stop(c.currentTime+dur);}catch(e){}}
+function playSelect(){beep(520,0.08,'sine',0.1);}
+function playPlace(){beep(300,0.07,'sine',0.1);setTimeout(()=>beep(400,0.09,'sine',0.08),65);}
+function playLineClear(n){[440,554,659,880].slice(0,n+1).forEach((f,i)=>setTimeout(()=>beep(f,0.18,'sine',0.13),i*85));}
+function playCombo(){[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>beep(f,0.14,'sine',0.15),i*55));}
+function playGameOver(){[350,280,220,170].forEach((f,i)=>setTimeout(()=>beep(f,0.2,'sine',0.1),i*130));}
+function playNewPieces(){[370,440,550].forEach((f,i)=>setTimeout(()=>beep(f,0.1,'sine',0.09),i*70));}
+function toggleSound(){soundOn=!soundOn;document.getElementById('sound-btn').textContent=soundOn?'🔊':'🔇';}
+let darkOn=false;
+function toggleDark(){
+  darkOn=!darkOn;document.body.classList.toggle('dark',darkOn);
+  ['dark-btn','dark-btn-mode'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=darkOn?'☀️':'🌙';});
+  try{localStorage.setItem('bb_dark',darkOn?'1':'0');}catch(e){}
+}
+function randShape(){return SHAPES[Math.floor(Math.random()*SHAPES.length)];}
+function randColor(){return COLORS[Math.floor(Math.random()*COLORS.length)];}
+function newPiece(){return{shape:randShape(),color:randColor()};}
+function initBoard(){board=Array.from({length:ROWS},()=>Array(COLS).fill(null));}
+function buildGrid(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    const c=document.createElement('div');c.className='gcell';c.dataset.r=y;c.dataset.c=x;
+    c.addEventListener('click',()=>placeOnGrid(y,x));
+    g.appendChild(c);}
+}
+function allCells(){return document.querySelectorAll('.gcell');}
+function renderGrid(){
+  allCells().forEach(c=>{
+    const r=+c.dataset.r,col=+c.dataset.c;c.className='gcell';c.style.background='';
+    if(board[r][col]){c.classList.add('filled');c.style.background=board[r][col];}});
+}
+function showPreview(row,col){
+  if(selectedPiece===null)return;clearPreview();
+  const p=pieces[selectedPiece];const valid=canPlace(p.shape,row,col);
+  p.shape.forEach((rr,dy)=>rr.forEach((v,dx)=>{
+    if(!v)return;const nr=row+dy,nc=col+dx;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS)return;
+    const cell=allCells()[nr*COLS+nc];if(board[nr][nc])return;
+    if(valid){cell.classList.add('preview');cell.style.background=p.color;}
+    else cell.classList.add('invalid');}));
+}
+function clearPreview(){
+  allCells().forEach(c=>{
+    if(c.classList.contains('preview')||c.classList.contains('invalid')){
+      c.classList.remove('preview','invalid');
+      const r=+c.dataset.r,col=+c.dataset.c;
+      if(!board[r][col])c.style.background='';}});}
+function canPlace(shape,row,col){
+  for(let dy=0;dy<shape.length;dy++)for(let dx=0;dx<shape[dy].length;dx++){
+    if(!shape[dy][dx])continue;const nr=row+dy,nc=col+dx;
+    if(nr>=ROWS||nc>=COLS||nr<0||nc<0||board[nr][nc])return false;}return true;}
+function placeOnGrid(row,col){
+  if(selectedPiece===null){setMsg('Önce bir blok seç!');return;}
+  if(usedFlags[selectedPiece])return;
+  const p=pieces[selectedPiece];
+  if(!canPlace(p.shape,row,col)){setMsg('Buraya sığmıyor!');return;}
+  playPlace();const placed=[];
+  p.shape.forEach((rr,dy)=>rr.forEach((v,dx)=>{
+    if(!v)return;board[row+dy][col+dx]=p.color;placed.push({r:row+dy,c:col+dx});}));
+  usedFlags[selectedPiece]=true;
+  const usedCard=document.getElementById('p'+selectedPiece);
+  usedCard.classList.add('used');setTimeout(()=>{usedCard.style.visibility='hidden';},260);
+  selectedPiece=null;
+  document.querySelectorAll('.piece-card').forEach(c=>c.classList.remove('selected'));
+  clearPreview();const ac=allCells();
+  placed.forEach(({r,c},i)=>{
+    const cell=ac[r*COLS+c];cell.classList.add('filled','placing');
+    cell.style.background=board[r][c];cell.style.animationDelay=(i*0.025)+'s';});
+  setTimeout(()=>{
+    const cleared=clearLines();const pts=placed.length*10+cleared*60;
+    score+=pts;lines+=cleared;
+    if(score>bestScore){bestScore=score;try{localStorage.setItem('bb_soft_best',bestScore);}catch(e){}}
+    updateScoreUI();showScoreFly(pts,row,col);
+    if(cleared>0){playLineClear(cleared);if(cleared>=2)setTimeout(()=>{playCombo();showCombo(cleared);},360);}
+    if(usedFlags.every(Boolean)){setTimeout(()=>{if(checkGameOver())showGameOver();else newPieces();},400);}
+    else{if(!anyCanPlace())setTimeout(showGameOver,400);else setMsg('Bir blok seç, sonra grid üzerine tıkla');}
+  },placed.length*25+80);}
+function showScoreFly(pts,row,col){
+  const gw=document.getElementById('grid-wrap');const fly=document.createElement('div');
+  fly.className='score-fly';fly.textContent='+'+pts;
+  fly.style.top=(row*40+20)+'px';fly.style.left=(col*40+20)+'px';
+  gw.appendChild(fly);setTimeout(()=>fly.remove(),850);}
+function showCombo(n){
+  const t=document.getElementById('combo-toast');
+  t.textContent=n>=4?'harika combo! x'+n:n+'x combo!';
+  t.className='show';setTimeout(()=>t.className='',760);}
+function clearLines(){
+  const rowsC=[],colsC=[];
+  for(let r=0;r<ROWS;r++)if(board[r].every(c=>c!==null))rowsC.push(r);
+  for(let c=0;c<COLS;c++)if(board.every(r=>r[c]!==null))colsC.push(c);
+  if(!rowsC.length&&!colsC.length)return 0;
+  const ac=allCells();const toAnim=new Set();
+  rowsC.forEach(r=>{for(let c=0;c<COLS;c++)toAnim.add(r*COLS+c);});
+  colsC.forEach(c=>{for(let r=0;r<ROWS;r++)toAnim.add(r*COLS+c);});
+  toAnim.forEach(idx=>{const cell=ac[idx];cell.classList.add('clearing');cell.style.animationDelay=(Math.random()*0.07)+'s';});
+  setTimeout(()=>{
+    rowsC.forEach(r=>{for(let c=0;c<COLS;c++)board[r][c]=null;});
+    colsC.forEach(c=>{for(let r=0;r<ROWS;r++)board[r][c]=null;});
+    ac.forEach(cell=>{
+      const r=+cell.dataset.r,c=+cell.dataset.c;
+      cell.className='gcell';cell.style.background='';cell.style.animationDelay='';
+      if(board[r][c]){cell.classList.add('filled','refill');cell.style.background=board[r][c];}});
+  },340);return rowsC.length+colsC.length;}
+function anyCanPlace(){return pieces.some((p,i)=>!usedFlags[i]&&boardHasRoom(p.shape));}
+function boardHasRoom(shape){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(canPlace(shape,r,c))return true;return false;}
+function checkGameOver(){return pieces.some((p,i)=>!usedFlags[i]&&!boardHasRoom(p.shape));}
+
+/* ── SÜRÜKLE-BIRAK SİSTEMİ ── */
+let dragPieceIdx=null, isDragging=false, dragStartX=0, dragStartY=0;
+const DRAG_THRESHOLD=5;
+
+function buildGhost(piece){
+  const ghost=document.getElementById('drag-ghost');
+  const cols=piece.shape[0].length;
+  ghost.innerHTML='<div style="display:grid;grid-template-columns:repeat('+cols+',40px);gap:2px;"></div>';
+  const g=ghost.firstChild;
+  piece.shape.forEach(row=>row.forEach(v=>{
+    const c=document.createElement('div');
+    c.style.cssText='width:40px;height:40px;border-radius:5px;box-shadow:'+(v?'0 3px 10px rgba(0,0,0,0.25)':'none')+';';
+    c.style.background=v?piece.color:'transparent';
+    g.appendChild(c);
+  }));
+}
+
+function showGhost(x,y){
+  const g=document.getElementById('drag-ghost');
+  g.style.display='block';
+  g.style.left=x+'px';
+  g.style.top=y+'px';
+}
+
+function hideGhost(){
+  document.getElementById('drag-ghost').style.display='none';
+}
+
+// İmlecin altındaki gcell'i ghost'u gizleyerek bul
+function cellUnderPoint(x,y){
+  const ghost=document.getElementById('drag-ghost');
+  const wasVisible=ghost.style.display!=='none';
+  ghost.style.display='none';
+  const el=document.elementFromPoint(x,y);
+  if(wasVisible)ghost.style.display='block';
+  if(el&&el.classList.contains('gcell'))return{r:+el.dataset.r,c:+el.dataset.c};
+  // üst elementlere bak
+  const els=document.elementsFromPoint(x,y);
+  if(wasVisible)ghost.style.display='block';
+  for(const e of els)if(e.classList.contains('gcell'))return{r:+e.dataset.r,c:+e.dataset.c};
+  return null;
+}
+
+// İmlecin altındaki hücreden, bloğun ortasını imlece hizalayarak sol-üst köşeyi hesapla
+function anchorFromCursor(x,y,shape){
+  const cell=cellUnderPoint(x,y);
+  if(!cell)return null;
+  const offR=Math.floor(shape.length/2);
+  const offC=Math.floor(shape[0].length/2);
+  return{r:cell.r-offR, c:cell.c-offC};
+}
+
+function startDrag(idx,cx,cy){
+  if(usedFlags[idx])return;
+  dragPieceIdx=idx; isDragging=false; dragStartX=cx; dragStartY=cy;
+}
+
+function onDragMove(cx,cy){
+  if(dragPieceIdx===null)return;
+  const dist=Math.sqrt((cx-dragStartX)**2+(cy-dragStartY)**2);
+  if(!isDragging&&dist<DRAG_THRESHOLD)return;
+
+  if(!isDragging){
+    isDragging=true;
+    document.body.classList.add('dragging-active');
+    selectedPiece=dragPieceIdx;
+    document.querySelectorAll('.piece-card').forEach((c,j)=>c.classList.toggle('selected',j===dragPieceIdx));
+    document.getElementById('p'+dragPieceIdx).classList.add('dragging');
+    buildGhost(pieces[dragPieceIdx]);
+    playSelect();
+  }
+
+  showGhost(cx,cy);
+
+  // Önizleme: bloğun ortası imlecin altındaki hücreye
+  clearPreview();
+  const anchor=anchorFromCursor(cx,cy,pieces[dragPieceIdx].shape);
+  if(anchor) showPreview(anchor.r,anchor.c);
+}
+
+function onDragEnd(cx,cy){
+  if(dragPieceIdx===null)return;
+  const wasDragging=isDragging, idx=dragPieceIdx;
+
+  hideGhost();
+  clearPreview();
+  document.body.classList.remove('dragging-active');
+  const card=document.getElementById('p'+idx);
+  if(card) card.classList.remove('dragging','selected');
+
+  if(wasDragging){
+    const anchor=anchorFromCursor(cx,cy,pieces[idx].shape);
+    if(anchor&&selectedPiece===idx){
+      placeOnGrid(anchor.r,anchor.c);
+    } else {
+      selectedPiece=null;
+      document.querySelectorAll('.piece-card').forEach(c=>c.classList.remove('selected'));
+      setMsg('Bloğu grid üzerine bırak');
+    }
+  } else {
+    // Tıklama — seç/seçimi kaldır
+    if(selectedPiece===idx){
+      selectedPiece=null;
+      document.querySelectorAll('.piece-card').forEach(c=>c.classList.remove('selected'));
+      setMsg('Bir blok seç, sonra grid üzerine tıkla');
+    } else {
+      selectPiece(idx);
+    }
+  }
+  dragPieceIdx=null; isDragging=false;
+}
+
+document.addEventListener('mousemove',e=>{
+  if(dragPieceIdx===null)return;
+  onDragMove(e.clientX,e.clientY);
+  // Tıkla-seç modunda da önizleme göster
+  if(!isDragging&&selectedPiece!==null){
+    const cell=cellUnderPoint(e.clientX,e.clientY);
+    clearPreview();
+    if(cell)showPreview(cell.r,cell.c);
+  }
+});
+document.addEventListener('mouseup',e=>{if(dragPieceIdx!==null)onDragEnd(e.clientX,e.clientY);});
+document.addEventListener('touchmove',e=>{
+  if(dragPieceIdx===null)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  onDragMove(t.clientX,t.clientY);
+},{passive:false});
+document.addEventListener('touchend',e=>{
+  if(dragPieceIdx===null)return;
+  const t=e.changedTouches[0];
+  onDragEnd(t.clientX,t.clientY);
+});
+// Grid üzerinde mouse hareket edince önizleme (sürükleme olmasa da)
+document.getElementById('grid').addEventListener('mouseleave',()=>{
+  if(!isDragging)clearPreview();
+});
+
+function handlePieceClick(i){if(!isDragging)selectPiece(i);}
+function selectPiece(i){
+  if(usedFlags[i])return;
+  selectedPiece=i;playSelect();
+  document.querySelectorAll('.piece-card').forEach((c,j)=>c.classList.toggle('selected',j===i&&!usedFlags[j]));
+  setMsg('Bloğu yerleştirmek için grid üzerine tıkla veya sürükle');
+}
+function renderPieces(){
+  pieces.forEach((p,i)=>{
+    const card=document.getElementById('p'+i);card.className='piece-card';card.style.visibility='visible';
+    const cols=p.shape[0].length;
+    card.innerHTML='<div class="pmini" style="grid-template-columns:repeat('+cols+',26px);gap:2px;display:grid;"></div>';
+    const grid=card.querySelector('.pmini');
+    p.shape.forEach(row=>row.forEach(v=>{
+      const c=document.createElement('div');c.className='pmini-cell';
+      c.style.background=v?p.color:'transparent';grid.appendChild(c);}));
+    card.addEventListener('mousedown',e=>{if(e.button===0){e.preventDefault();startDrag(i,e.clientX,e.clientY);}});
+    card.addEventListener('touchstart',e=>{const t=e.touches[0];startDrag(i,t.clientX,t.clientY);},{passive:true});
+  });}
+function newPieces(){
+  playNewPieces();pieces=[newPiece(),newPiece(),newPiece()];
+  usedFlags=[false,false,false];selectedPiece=null;renderPieces();
+  setMsg('Bir blok seç, sonra grid üzerine tıkla');
+  if(!anyCanPlace())setTimeout(showGameOver,300);}
+function updateScoreUI(){
+  document.getElementById('sv').textContent=score;document.getElementById('bv').textContent=bestScore;
+  document.getElementById('lv').textContent=lines;
+  const sc=document.getElementById('sv').closest('.scard');sc.classList.remove('bump');void sc.offsetWidth;sc.classList.add('bump');}
+function setMsg(t){const m=document.getElementById('msg');m.style.opacity=0;setTimeout(()=>{m.textContent=t;m.style.opacity=1;},120);}
+function showGameOver(){
+  playGameOver();document.getElementById('gameover').style.display='flex';
+  document.getElementById('arena').style.opacity='0.35';
+  document.getElementById('go-score').textContent='Skor: '+score+' — En yüksek: '+bestScore;}
+function restartGame(){
+  document.getElementById('gameover').style.display='none';
+  document.getElementById('arena').style.opacity='1';
+  initBoard();score=0;lines=0;updateScoreUI();renderGrid();newPieces();}
+
+/* BAŞLANGIÇ */
+document.getElementById('bv').textContent=bestScore;
+try{if(localStorage.getItem('bb_dark')==='1'){darkOn=true;document.body.classList.add('dark');
+  ['dark-btn','dark-btn-mode'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='☀️';});}}catch(e){}
+</script>
+</body>
+</html>
