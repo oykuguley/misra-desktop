@@ -437,68 +437,73 @@
           <a class="window__maximize"></a>
         </div>
       </div>
-      <div class="window__body" style="position:absolute;top:28px;left:0;right:0;bottom:0;display:flex;flex-direction:row;overflow:hidden;">
-        <div style="flex:1;min-width:0;overflow:hidden;border-right:1px solid #333;">
+      <div class="window__body" style="position:absolute;top:28px;left:0;right:0;bottom:0;display:flex;flex-direction:column;overflow:hidden;background:#1a1a1a;">
+        <!-- Sekmeler -->
+        <div style="display:flex;gap:0;flex-shrink:0;background:#111;border-bottom:1px solid #333;">
+          <button onclick="bbTab('keyif',this)" id="tab-keyif" style="padding:8px 20px;background:#1db954;color:#000;border:none;font-size:13px;font-weight:600;cursor:pointer;">🎮 Keyif Modu</button>
+          <button onclick="bbTab('podcast',this)" id="tab-podcast" style="padding:8px 20px;background:transparent;color:#aaa;border:none;font-size:13px;cursor:pointer;border-left:1px solid #333;">🎙 Podcast Modu</button>
+        </div>
+        <!-- Keyif Modu -->
+        <div id="bb-keyif" style="flex:1;overflow:hidden;display:flex;">
           <iframe src="blockblast.html" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>
         </div>
-        <div style="width:250px;flex-shrink:0;background:#111;display:flex;flex-direction:column;overflow:hidden;">
-          <div style="padding:12px;border-bottom:1px solid #222;flex-shrink:0;">
-            <div style="color:#fff;font-size:13px;font-weight:600;">🎙 10 Dakika Kadar</div>
-            <div style="color:#888;font-size:11px;margin-top:2px;">Bölümler</div>
+        <!-- Podcast Modu -->
+        <div id="bb-podcast" style="flex:1;overflow:hidden;display:none;flex-direction:row;">
+          <div style="flex:1;min-width:0;overflow:hidden;border-right:1px solid #333;">
+            <iframe src="blockblast.html" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>
           </div>
-          <div style="flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;">
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">Intro</span>
+          <div style="width:240px;flex-shrink:0;background:#111;display:flex;flex-direction:column;overflow:hidden;">
+            <div style="padding:12px;border-bottom:1px solid #222;flex-shrink:0;">
+              <div style="color:#fff;font-size:13px;font-weight:600;">🎙 10 Dakika Kadar</div>
+              <div style="color:#888;font-size:11px;margin-top:2px;">Bölümler</div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;"><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">Intro</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="01_intro.mp3" type="audio/mpeg">
                 </audio>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">Pilot</span>
+              </div><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">Pilot</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="02_pilot.mp3" type="audio/mpeg">
                 </audio>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">1. Bölüm</span>
+              </div><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">1. Bölüm</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="03_birinci.mp3" type="audio/mpeg">
                 </audio>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">2. Bölüm</span>
+              </div><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">2. Bölüm</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="04_ikinci.mp3" type="audio/mpeg">
                 </audio>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">3. Bölüm</span>
+              </div><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">3. Bölüm</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="05_ucuncu.mp3" type="audio/mpeg">
                 </audio>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">4. Bölüm</span>
+              </div><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">4. Bölüm</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="06_dorduncu.mp3" type="audio/mpeg">
                 </audio>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">5. Bölüm</span>
+              </div><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">5. Bölüm</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="07_besinci.mp3" type="audio/mpeg">
                 </audio>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
-                <span style="color:#ccc;font-size:12px;min-width:80px;">6. Bölüm</span>
+              </div><div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e1e1e;border-radius:8px;">
+                <span style="color:#ccc;font-size:12px;min-width:70px;">6. Bölüm</span>
                 <audio controls style="flex:1;height:28px;" preload="none">
                   <source src="08_altinci.mp3" type="audio/mpeg">
                 </audio>
               </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
 
 
 
@@ -966,5 +971,16 @@
   });
   </script>
 
+
+  <script>
+  function bbTab(mode, btn) {
+    document.getElementById('bb-keyif').style.display = mode==='keyif' ? 'flex' : 'none';
+    document.getElementById('bb-podcast').style.display = mode==='podcast' ? 'flex' : 'none';
+    document.getElementById('tab-keyif').style.background = mode==='keyif' ? '#1db954' : 'transparent';
+    document.getElementById('tab-keyif').style.color = mode==='keyif' ? '#000' : '#aaa';
+    document.getElementById('tab-podcast').style.background = mode==='podcast' ? '#1db954' : 'transparent';
+    document.getElementById('tab-podcast').style.color = mode==='podcast' ? '#000' : '#aaa';
+  }
+  </script>
 </body>
 </html>
