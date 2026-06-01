@@ -192,63 +192,15 @@
         <div class="window__controls"><a class="window__close"></a><a class="window__minimize"></a><a class="window__maximize"></a></div>
         <div class="window__actions"><a class="nav prev disabled"></a><a class="nav next disabled"></a><a class="search"><i></i><input type="text" class="filesysSearch" placeholder="Ara" spellcheck="false" autocomplete="off"/></a></div>
       </div>
-                        <div class="window__body" style="background:#1a1a1a;display:flex;flex-direction:column;overflow:hidden;">
-        <div style="flex:1;min-height:0;overflow:hidden;">
-          
+                        <div class="window__body">
+        <div class="sidebar" data-display="items">
+          <div class="title" data-group="favorites">Favoriler</div>
+          <div class="item" data-item="recents">Son Kullanılanlar</div>
+          <div class="item" data-item="downloads">İndirilenler</div>
+          <div class="item active" data-item="documents">Belgeler</div>
+          <div class="item" data-item="desktop">Masaüstü</div>
         </div>
-        <div style="flex-shrink:0;max-height:220px;overflow-y:auto;background:#111;border-top:1px solid #333;padding:10px;">
-          <div style="color:#888;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;padding:0 4px;">10 Dakika Kadar — Bölümler</div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">Intro</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=1xBtassidXJvHNWNl5LkkEZX-lU_NiWh4" type="audio/mpeg">
-              </audio>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">Pilot</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=1As4QtCpD9cvUysMnjvfGX8sgypvUX9cj" type="audio/mpeg">
-              </audio>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">1. Bölüm</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=1dzJsFq803d7s0OXlybpj36DisboHQvVq" type="audio/mpeg">
-              </audio>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">2. Bölüm</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=11GtWrP5Ci9tmfclxXWwda_faHlVMCHG1" type="audio/mpeg">
-              </audio>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">3. Bölüm</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=1QjsJKq1m4zhpDJ1uSrhO0TCJo7_r3HYD" type="audio/mpeg">
-              </audio>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">4. Bölüm</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=1dLABM6q8dJRJMLlX1knnEz_PJ8IjK099" type="audio/mpeg">
-              </audio>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">5. Bölüm</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=1lyFOwSUeRQt2LH0hGfwEhjVhV8rspMzi" type="audio/mpeg">
-              </audio>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#1e1e1e;border-radius:8px;">
-              <span style="color:#ccc;font-size:13px;min-width:90px;">6. Bölüm</span>
-              <audio controls style="flex:1;height:32px;" preload="none">
-                <source src="https://drive.google.com/uc?export=download&id=1PZx0UBwqH9bK1QCSb6q9gC9Pha5i0V-W" type="audio/mpeg">
-              </audio>
-            </div>
-          </div>
-        </div>
+        <div class="window__main hasSideBar filesys" data-visualization="icons"></div>
       </div>
     </div>
 
