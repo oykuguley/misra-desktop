@@ -885,39 +885,70 @@
 
 
 
-  <script>
-  function bindWindowControls(win) {
-    var $win = $(win);
-    var iW, iH, iT, iL;
-    
-    $win.find('.window__close').off('mousedown.custom').on('mousedown.custom', function(e) {
-      e.stopPropagation();
-      $win.hide();
-    });
-    
-    $win.find('.window__minimize').off('click.custom').on('click.custom', function(e) {
-      e.stopPropagation();
-      $win.hide();
-    });
-    
-    $win.find('.window__maximize:not(.disabled)').off('click.custom').on('click.custom', function(e) {
-      e.stopPropagation();
-      if ($win.hasClass('window--maximized')) {
-        $win.removeClass('window--maximized').css({width:iW, height:iH, top:iT, left:iL});
-      } else {
-        iW = $win.width(); iH = $win.height();
-        iT = $win.position().top; iL = $win.position().left;
-        $win.addClass('window--maximized').css({
-          width:'100vw', height:'calc(100vh - 24px)', top:24, left:0,
-          'border-radius':0, 'max-width':'none', 'max-height':'none'
-        });
-      }
-    });
-  }
   
-  $(document).ready(function() {
-    // Tüm statik pencerelere handler bağla
-    $('.window').each(function() { bindWindowControls(this); });
+
+
+  <script>
+  // Script.js yüklendikten sonra window controls override et
+  window.addEventListener('load', function() {
+    
+    // Tüm close butonlarına direkt event listener ekle
+    document.querySelectorAll('.window__close').forEach(function(btn) {
+      btn.addEventListener('mousedown', function(e) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        var win = this.closest('.window');
+        if (win) {
+          win.style.display = 'none';
+          win.style.opacity = '0';
+          win.style.pointerEvents = 'none';
+        }
+      }, true); // capture phase - script.js'den önce çalışır
+    });
+    
+    // Minimize butonları
+    document.querySelectorAll('.window__minimize').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        var win = this.closest('.window');
+        if (win) {
+          win.style.display = 'none';
+          win.style.opacity = '0';
+          win.style.pointerEvents = 'none';
+        }
+      }, true);
+    });
+    
+    // Maximize butonları
+    document.querySelectorAll('.window__maximize:not(.disabled)').forEach(function(btn) {
+      var win = btn.closest('.window');
+      if (!win) return;
+      var iW, iH, iT, iL, isMax = false;
+      
+      btn.addEventListener('click', function(e) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        if (isMax) {
+          isMax = false;
+          win.style.cssText = win.dataset.origStyle || '';
+          win.classList.remove('window--maximized');
+        } else {
+          isMax = true;
+          win.dataset.origStyle = win.getAttribute('style') || '';
+          win.classList.add('window--maximized');
+          win.style.position = 'fixed';
+          win.style.top = '24px';
+          win.style.left = '0';
+          win.style.width = '100vw';
+          win.style.height = 'calc(100vh - 24px)';
+          win.style.zIndex = '9999';
+          win.style.borderRadius = '0';
+          win.style.maxWidth = 'none';
+          win.style.maxHeight = 'none';
+        }
+      }, true);
+    });
   });
   </script>
 
