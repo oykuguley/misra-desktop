@@ -476,61 +476,23 @@
       </div>
     </div>
 
-<div class="window window--game1 window--minimized" data-windowBackdrop="true" data-window="game1" style="width:950px;height:600px;min-width:700px;min-height:450px;top:60px;left:150px;">
+<div class="window window--game1 window--minimized" data-windowBackdrop="true" data-window="game1" style="width:800px;height:540px;min-width:600px;min-height:400px;top:80px;left:300px;">
       <div class="window__handler">
-        <div class="window__title" style="display:flex;align-items:center;gap:8px;"><img src="tetris-icon.png" style="width:16px;height:16px;border-radius:4px;" /> Block Blast & Podcast</div>
+        <div class="window__title" style="display:flex;align-items:center;gap:8px;"><img src="tetris-icon.png" style="width:16px;height:16px;border-radius:4px;" /> Tetris</div>
         <div class="window__controls">
           <a class="window__close"></a>
           <a class="window__minimize"></a>
           <a class="window__maximize"></a>
         </div>
       </div>
-      <div class="window__body" style="display:flex;flex-direction:row;overflow:hidden;background:#1a1a1a;position:absolute;top:28px;left:0;right:0;bottom:0;width:100%;height:calc(100% - 28px);">
-        <div style="flex:1;min-width:0;overflow:hidden;border-right:1px solid #333;">
-          <iframe src="blockblast.html" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>
-        </div>
-        <div style="width:260px;flex-shrink:0;background:#111;display:flex;flex-direction:column;overflow:hidden;">
-          <div style="padding:12px;border-bottom:1px solid #222;flex-shrink:0;">
-            <div style="color:#fff;font-size:13px;font-weight:600;">🎙 10 Dakika Kadar</div>
-            <div style="color:#888;font-size:11px;margin-top:2px;">Bölümler</div>
-          </div>
-          <div style="flex:1;overflow-y:auto;padding:8px;">
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">Intro</div>
-                <iframe src="https://drive.google.com/file/d/1xBtassidXJvHNWNl5LkkEZX-lU_NiWh4/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">Pilot</div>
-                <iframe src="https://drive.google.com/file/d/1As4QtCpD9cvUysMnjvfGX8sgypvUX9cj/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">1. Bölüm</div>
-                <iframe src="https://drive.google.com/file/d/1dzJsFq803d7s0OXlybpj36DisboHQvVq/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">2. Bölüm</div>
-                <iframe src="https://drive.google.com/file/d/11GtWrP5Ci9tmfclxXWwda_faHlVMCHG1/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">3. Bölüm</div>
-                <iframe src="https://drive.google.com/file/d/1QjsJKq1m4zhpDJ1uSrhO0TCJo7_r3HYD/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">4. Bölüm</div>
-                <iframe src="https://drive.google.com/file/d/1dLABM6q8dJRJMLlX1knnEz_PJ8IjK099/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">5. Bölüm</div>
-                <iframe src="https://drive.google.com/file/d/1lyFOwSUeRQt2LH0hGfwEhjVhV8rspMzi/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-              <div style="margin-bottom:4px;">
-                <div style="color:#ccc;font-size:11px;padding:4px 2px;">6. Bölüm</div>
-                <iframe src="https://drive.google.com/file/d/1PZx0UBwqH9bK1QCSb6q9gC9Pha5i0V-W/preview" style="width:100%;height:40px;border:none;border-radius:6px;" allow="autoplay"></iframe>
-              </div>
-          </div>
+      <div class="window__body">
+        <div class="misra-placeholder">
+          <img src="tetris-icon.png" style="border-radius:14px;" />
+          <p>Oyun yakında eklenecek</p>
         </div>
       </div>
     </div>
+
 
 
     </div>
@@ -918,18 +880,53 @@
 
   
 
-  // Close butonu fix - window--closed olan pencere tekrar açılabilsin
-  document.addEventListener('click', function(e) {
-    var closeBtn = e.target.closest('.window__close');
-    var minBtn = e.target.closest('.window__minimize');
-    if (!closeBtn && !minBtn) return;
-    var win = (closeBtn || minBtn).closest('.window');
-    if (!win) return;
-    setTimeout(function() {
-      win.style.opacity = '0';
-      win.style.pointerEvents = 'none';
-    }, 10);
+  
+
+  <script>
+  // Statik pencereler için window controls
+  $(document).ready(function() {
+    var zIdx = 100;
+    
+    $('.window:not(.tmp)').each(function() {
+      var win = $(this);
+      var initialW, initialH, initialT, initialL;
+      
+      // Close
+      win.find('.window__close').off('mousedown').on('mousedown', function(e) {
+        e.stopPropagation();
+        win.addClass('window--closing');
+        setTimeout(function() {
+          win.hide().removeClass('window--closing').addClass('window--minimized');
+        }, 100);
+      });
+      
+      // Minimize
+      win.find('.window__minimize').off('click').on('click', function(e) {
+        e.stopPropagation();
+        win.hide().addClass('window--minimized');
+      });
+      
+      // Maximize
+      win.find('.window__maximize:not(.disabled)').off('click').on('click', function(e) {
+        e.stopPropagation();
+        if (win.hasClass('window--maximized')) {
+          win.removeClass('window--maximized').css({
+            width: initialW, height: initialH, top: initialT, left: initialL
+          });
+        } else {
+          initialW = win.width();
+          initialH = win.height();
+          initialT = win.position().top;
+          initialL = win.position().left;
+          win.addClass('window--maximized').css({
+            width: '100vw', height: 'calc(100vh - 24px)',
+            top: 24, left: 0
+          });
+        }
+      });
+    });
   });
+  </script>
 
 </body>
 </html>
