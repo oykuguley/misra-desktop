@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Block Blast</title>
 <style>
-html{height:100%;}
-
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#f5f3ef;--card:#edeae4;--card-border:#d8d5cf;
@@ -21,7 +19,7 @@ body.dark{
   --grid-bg:#23263a;--gameover-bg:#1e2030;--combo-bg:#1e3a5a;
   --combo-color:#7ab8e8;--score-fly:#6ab0e0;
 }
-body{background:var(--bg);display:flex;justify-content:center;align-items:flex-start;height:100%;padding:4px;font-family:system-ui,sans-serif;transition:var(--tt);overflow-y:auto;margin:0;}
+body{background:var(--bg);display:flex;justify-content:center;min-height:100vh;padding:20px;font-family:system-ui,sans-serif;transition:var(--tt);}
 #root{display:flex;flex-direction:column;align-items:center;padding:16px;gap:14px;width:100%;}
 
 /* MOD SEÇİM */
@@ -229,14 +227,14 @@ body.dragging-active{user-select:none;cursor:grabbing;}
 <script>
 /* ── PODCAST VERİSİ ── */
 const EPISODES=[
-  {title:'Intro',       file:'audio/01_intro.mp3'},
-  {title:'Pilot',       file:'audio/02_pilot.mp3'},
-  {title:'1. Bölüm',   file:'audio/03_birinci.mp3'},
-  {title:'2. Bölüm',   file:'audio/04_ikinci.mp3'},
-  {title:'3. Bölüm',   file:'audio/05_ucuncu.mp3'},
-  {title:'4. Bölüm',   file:'audio/06_dorduncu.mp3'},
-  {title:'5. Bölüm',   file:'audio/07_besinci.mp3'},
-  {title:'6. Bölüm',   file:'audio/08_altinci.mp3'},
+  {title:'Intro',       file:'01_intro.mp3'},
+  {title:'Pilot',       file:'02_pilot.mp3'},
+  {title:'1. Bölüm',   file:'03_birinci.mp3'},
+  {title:'2. Bölüm',   file:'04_ikinci.mp3'},
+  {title:'3. Bölüm',   file:'05_ucuncu.mp3'},
+  {title:'4. Bölüm',   file:'06_dorduncu.mp3'},
+  {title:'5. Bölüm',   file:'07_besinci.mp3'},
+  {title:'6. Bölüm',   file:'08_altinci.mp3'},
 ];
 
 let audio=new Audio();
